@@ -39,12 +39,12 @@ export default function App() {
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const response = await getHistory(50, 0);
+        const response = await getHistory(50, 0, 'default');
         if (response.success && response.messages.length > 0) {
           // Create a chat from the history
           const historyChat: Chat = {
-            id: 'history',
-            title: 'Conversation History',
+            id: 'default',
+            title: 'Conversation',
             timestamp: new Date(),
             messages: response.messages.map((msg, idx) => ({
               id: idx.toString(),
@@ -54,7 +54,7 @@ export default function App() {
             })),
           };
           setChats([historyChat]);
-          setCurrentChatId('history');
+          setCurrentChatId('default');
         }
         setIsInitialized(true);
       } catch (error) {
@@ -152,6 +152,7 @@ export default function App() {
         message: content,
         include_context: true,
         top_k: 8,
+        conversation_id: chatId,
       });
 
       if (response.success && response.message) {

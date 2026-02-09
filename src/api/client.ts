@@ -66,10 +66,17 @@ export async function sendChatMessage(payload: ChatRequestPayload): Promise<Chat
 /**
  * Get conversation history
  */
-export async function getHistory(limit: number = 50, offset: number = 0): Promise<HistoryResponse> {
+export async function getHistory(
+  limit: number = 50,
+  offset: number = 0,
+  conversationId?: string
+): Promise<HistoryResponse> {
   const url = new URL(API_ENDPOINTS.HISTORY);
   url.searchParams.append('limit', limit.toString());
   url.searchParams.append('offset', offset.toString());
+  if (conversationId) {
+    url.searchParams.append('conversation_id', conversationId);
+  }
 
   return apiCall<HistoryResponse>(url.toString(), {
     method: 'GET',

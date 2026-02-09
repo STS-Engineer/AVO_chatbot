@@ -7,6 +7,7 @@ export interface ChatRequestPayload {
   message: string;
   include_context?: boolean;
   top_k?: number;
+  conversation_id?: string;
 }
 
 export interface SearchRequestPayload {
