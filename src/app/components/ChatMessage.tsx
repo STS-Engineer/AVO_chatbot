@@ -108,7 +108,7 @@ export function ChatMessage({
           flex-shrink-0 size-10 rounded-xl flex items-center justify-center shadow-lg
           ${isUser 
             ? 'bg-gradient-to-br from-slate-700 to-slate-900 dark:from-slate-600 dark:to-slate-800' 
-            : 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600'
+            : 'bg-gradient-to-br from-blue-600 via-sky-500 to-orange-500'
           }
         `}>
           {isUser ? (

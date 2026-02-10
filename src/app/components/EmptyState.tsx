@@ -6,8 +6,8 @@ export function EmptyState({ onSuggestClick }: EmptyStateProps) {
   return (
     <div className="flex-1 flex items-center justify-center p-8">
       <div className="max-w-3xl w-full space-y-8">
-        <div className="glass-card rounded-3xl px-8 py-10 text-center space-y-6 reveal-in">
-          <div className="inline-flex items-center justify-center size-20 rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-2xl shadow-emerald-500/30 float-slow">
+        <div className="glass-card empty-hero rounded-3xl px-8 py-10 text-center space-y-6 reveal-in">
+          <div className="inline-flex items-center justify-center size-20 rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-orange-500 shadow-2xl shadow-blue-500/30 float-slow">
             <Bot className="size-10 text-white" />
           </div>
           <div className="space-y-3">

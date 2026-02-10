@@ -23,6 +23,7 @@ interface Chat {
   title: string;
   timestamp: Date;
   messages: Message[];
+  isPinned?: boolean;
 }
 
 export default function App() {
@@ -52,6 +53,7 @@ export default function App() {
               content: msg.content,
               timestamp: msg.timestamp,
             })),
+            isPinned: false,
           };
           setChats([historyChat]);
           setCurrentChatId('default');
@@ -90,7 +92,8 @@ export default function App() {
       id: Date.now().toString(),
       title: "New Chat",
       timestamp: new Date(),
-      messages: []
+      messages: [],
+      isPinned: false,
     };
     setChats(prev => [newChat, ...prev]);
     setCurrentChatId(newChat.id);
@@ -102,6 +105,14 @@ export default function App() {
     if (currentChatId === chatId) {
       setCurrentChatId(null);
     }
+  };
+
+  const togglePinChat = (chatId: string) => {
+    setChats(prev => prev.map(chat =>
+      chat.id === chatId
+        ? { ...chat, isPinned: !chat.isPinned }
+        : chat
+    ));
   };
 
 
@@ -118,7 +129,8 @@ export default function App() {
         id: Date.now().toString(),
         title: content.slice(0, 50),
         timestamp: new Date(),
-        messages: []
+        messages: [],
+        isPinned: false,
       };
       chatId = newChat.id;
       setChats(prev => [newChat, ...prev]);
@@ -231,6 +243,7 @@ export default function App() {
             setSidebarOpen(false);
           }}
           onDeleteChat={deleteChat}
+          onTogglePin={togglePinChat}
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
           theme={theme}
@@ -290,7 +303,7 @@ function LoadingMessage() {
   return (
     <div className="w-full py-8 px-4">
       <div className="max-w-4xl mx-auto flex gap-6">
-        <div className="flex-shrink-0 size-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600">
+        <div className="flex-shrink-0 size-10 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-600 via-sky-500 to-orange-500">
           <span className="size-4 rounded-full bg-white/80 typing-shimmer" />
         </div>
         <div className="flex-1 space-y-4 glass-card rounded-2xl p-4 md:p-5 border-emerald-200/50 dark:border-emerald-400/20">

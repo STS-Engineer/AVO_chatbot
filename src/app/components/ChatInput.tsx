@@ -73,7 +73,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
 
   return (
     <div className="border-t soft-divider bg-transparent p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         {/* Attached Files Preview */}
         {attachedFiles.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-2">
@@ -132,14 +132,14 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             onKeyDown={handleKeyDown}
             placeholder="Message Avocarbon AI..."
             disabled={disabled}
-            className="min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400"
+            className="min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 whitespace-pre-wrap break-words"
             rows={1}
           />
           <Button
             onClick={handleSend}
             disabled={(!message.trim() && attachedFiles.length === 0) || disabled}
             size="icon"
-            className="size-10 flex-shrink-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 hover:from-emerald-500 hover:via-teal-600 hover:to-cyan-700 rounded-xl shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:shadow-none"
+            className="size-10 flex-shrink-0 bg-gradient-to-r from-blue-600 via-sky-500 to-orange-500 hover:from-blue-700 hover:via-sky-600 hover:to-orange-600 rounded-xl shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none"
           >
             <Send className="size-5 text-white" />
           </Button>
