@@ -6,6 +6,7 @@ import { API_ENDPOINTS, REQUEST_TIMEOUT } from './config';
 import {
   ChatRequestPayload,
   ChatResponse,
+  EditMessageRequestPayload,
   SearchRequestPayload,
   SearchResponse,
   HistoryResponse,
@@ -58,6 +59,16 @@ async function apiCall<T>(
  */
 export async function sendChatMessage(payload: ChatRequestPayload): Promise<ChatResponse> {
   return apiCall<ChatResponse>(API_ENDPOINTS.CHAT, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Edit a prior user message and regenerate the assistant response
+ */
+export async function editChatMessage(payload: EditMessageRequestPayload): Promise<ChatResponse> {
+  return apiCall<ChatResponse>(API_ENDPOINTS.EDIT_MESSAGE, {
     method: 'POST',
     body: JSON.stringify(payload),
   });

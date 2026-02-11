@@ -3,8 +3,7 @@ import { ChatSidebar } from "./components/ChatSidebar";
 import { ChatMessage } from "./components/ChatMessage";
 import { ChatInput, AttachedFile } from "./components/ChatInput";
 import { EmptyState } from "./components/EmptyState";
-import { ScrollArea } from "./components/ui/scroll-area";
-import { sendChatMessage, getHistory } from "../api/client";
+import { sendChatMessage, getHistory, editChatMessage } from "../api/client";
 import { ChatResponse, ContextItem } from "../api/types";
 
 interface Message {
@@ -34,6 +33,8 @@ export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [apiError, setApiError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [draftMessage, setDraftMessage] = useState<string>('');
+  const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Load conversation history on mount
@@ -146,6 +147,11 @@ export default function App() {
       timestamp: new Date().toISOString(),
     };
 
+    if (editingMessageIndex !== null) {
+      await handleEditMessage(chatId, editingMessageIndex, content);
+      return;
+    }
+
     // Add user message
     setChats(prev => prev.map(chat => 
       chat.id === chatId
@@ -204,6 +210,72 @@ export default function App() {
       ));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEditMessage = async (chatId: string, messageIndex: number, content: string) => {
+    setApiError(null);
+    setIsLoading(true);
+
+    setChats(prev => prev.map(chat => {
+      if (chat.id !== chatId) return chat;
+      const updatedMessages = chat.messages.map((msg, idx) =>
+        idx === messageIndex ? { ...msg, content, timestamp: new Date().toISOString() } : msg
+      );
+      return {
+        ...chat,
+        messages: updatedMessages.slice(0, messageIndex + 1),
+      };
+    }));
+
+    try {
+      const response: ChatResponse = await editChatMessage({
+        message: content,
+        message_index: messageIndex,
+        include_context: true,
+        top_k: 8,
+        conversation_id: chatId,
+      });
+
+      if (response.success && response.message) {
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response.message,
+          context_items: response.context_items,
+          context: response.context,
+          timestamp: response.timestamp,
+        };
+
+        setChats(prev => prev.map(chat =>
+          chat.id === chatId
+            ? { ...chat, messages: [...chat.messages, assistantMessage] }
+            : chat
+        ));
+      } else {
+        throw new Error(response.error || 'Failed to get response from AI');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to edit message';
+      setApiError(errorMessage);
+
+      const errorAssistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Error: ${errorMessage}`,
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+      };
+
+      setChats(prev => prev.map(chat =>
+        chat.id === chatId
+          ? { ...chat, messages: [...chat.messages, errorAssistantMessage] }
+          : chat
+      ));
+    } finally {
+      setIsLoading(false);
+      setEditingMessageIndex(null);
+      setDraftMessage('');
     }
   };
 
@@ -266,16 +338,31 @@ export default function App() {
                     content={message.content}
                     files={message.files}
                     context_items={message.context_items}
-                    context={message.context}
                     isLatest={index === currentChat.messages.length - 1}
                     sequence={index}
+                    onEdit={message.role === 'user'
+                      ? () => {
+                          setEditingMessageIndex(index);
+                          setDraftMessage(message.content);
+                        }
+                      : undefined}
                   />
                 ))}
                 {isLoading && <LoadingMessage />}
               </div>
 
               {/* Input */}
-              <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+              <ChatInput
+                onSend={handleSendMessage}
+                disabled={isLoading}
+                value={draftMessage}
+                onChange={setDraftMessage}
+                isEditing={editingMessageIndex !== null}
+                onCancelEdit={() => {
+                  setEditingMessageIndex(null);
+                  setDraftMessage('');
+                }}
+              />
             </>
           ) : !isInitialized ? (
             <div className="flex-1 flex items-center justify-center">
@@ -290,7 +377,17 @@ export default function App() {
               <EmptyState onSuggestClick={handleSuggestionClick} />
 
               {/* Input */}
-              <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+              <ChatInput
+                onSend={handleSendMessage}
+                disabled={isLoading}
+                value={draftMessage}
+                onChange={setDraftMessage}
+                isEditing={editingMessageIndex !== null}
+                onCancelEdit={() => {
+                  setEditingMessageIndex(null);
+                  setDraftMessage('');
+                }}
+              />
             </>
           )}
         </div>

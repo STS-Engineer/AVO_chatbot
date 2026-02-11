@@ -15,6 +15,14 @@ export interface SearchRequestPayload {
   top_k?: number;
 }
 
+export interface EditMessageRequestPayload {
+  message: string;
+  message_index: number;
+  include_context?: boolean;
+  top_k?: number;
+  conversation_id?: string;
+}
+
 // Response Types
 export interface Attachment {
   id: string;

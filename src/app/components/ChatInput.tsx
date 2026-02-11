@@ -14,12 +14,26 @@ export interface AttachedFile {
 interface ChatInputProps {
   onSend: (message: string, files?: AttachedFile[]) => void;
   disabled?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
+  isEditing?: boolean;
+  onCancelEdit?: () => void;
 }
 
-export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  disabled = false,
+  value,
+  onChange,
+  isEditing = false,
+  onCancelEdit,
+}: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isControlled = typeof value === "string" && typeof onChange === "function";
+  const messageValue = isControlled ? value : message;
+  const setMessageValue = isControlled ? onChange : setMessage;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -57,9 +71,9 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   const handleSend = () => {
-    if ((message.trim() || attachedFiles.length > 0) && !disabled) {
-      onSend(message.trim(), attachedFiles.length > 0 ? attachedFiles : undefined);
-      setMessage("");
+    if ((messageValue.trim() || attachedFiles.length > 0) && !disabled) {
+      onSend(messageValue.trim(), attachedFiles.length > 0 ? attachedFiles : undefined);
+      setMessageValue("");
       setAttachedFiles([]);
     }
   };
@@ -104,6 +118,21 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           </div>
         )}
 
+        {isEditing && (
+          <div className="mb-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Editing message</span>
+            {onCancelEdit && (
+              <button
+                type="button"
+                onClick={onCancelEdit}
+                className="text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="relative flex items-end gap-2 glass-panel rounded-2xl p-2 focus-within:border-blue-500 dark:focus-within:border-blue-400 transition-colors hover:-translate-y-0.5">
           {/* File Input (Hidden) */}
           <input
@@ -121,23 +150,23 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             size="icon"
             className="size-10 flex-shrink-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl"
             onClick={() => fileInputRef.current?.click()}
-            disabled={disabled}
+            disabled={disabled || isEditing}
           >
             <Paperclip className="size-5 text-slate-600 dark:text-slate-400" />
           </Button>
 
           <Textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={messageValue}
+            onChange={(e) => setMessageValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Message Avocarbon AI..."
+            placeholder={isEditing ? "Edit your message..." : "Message Avocarbon AI..."}
             disabled={disabled}
             className="min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 whitespace-pre-wrap break-words"
             rows={1}
           />
           <Button
             onClick={handleSend}
-            disabled={(!message.trim() && attachedFiles.length === 0) || disabled}
+            disabled={(!messageValue.trim() && attachedFiles.length === 0) || disabled}
             size="icon"
             className="size-10 flex-shrink-0 bg-gradient-to-r from-blue-600 via-sky-500 to-orange-500 hover:from-blue-700 hover:via-sky-600 hover:to-orange-600 rounded-xl shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none"
           >

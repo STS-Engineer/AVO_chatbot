@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   CHAT: `${API_BASE_URL}/api/chat`,
   HISTORY: `${API_BASE_URL}/api/history`,
   CLEAR_HISTORY: `${API_BASE_URL}/api/clear-history`,
+  EDIT_MESSAGE: `${API_BASE_URL}/api/edit-message`,
   SEARCH: `${API_BASE_URL}/api/search`,
   
   // Health

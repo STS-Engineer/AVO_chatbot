@@ -1,4 +1,4 @@
-import { User, Bot, FileText, Download, ImageIcon } from "lucide-react";
+import { User, Bot, FileText, Download, ImageIcon, Pencil } from "lucide-react";
 import { motion } from "motion/react";
 import { AttachedFile } from "./ChatInput";
 import { ContextItem } from "../../api/types";
@@ -9,9 +9,9 @@ interface ChatMessageProps {
   content: string;
   files?: AttachedFile[];
   context_items?: ContextItem[];
-  context?: string;
   isLatest?: boolean;
   sequence?: number;
+  onEdit?: () => void;
 }
 
 export function ChatMessage({
@@ -19,9 +19,9 @@ export function ChatMessage({
   content,
   files,
   context_items,
-  context,
   isLatest = false,
   sequence,
+  onEdit,
 }: ChatMessageProps) {
   const isUser = role === 'user';
   const shouldAnimate = isLatest || (typeof sequence === "number" && sequence < 6);
@@ -126,8 +126,18 @@ export function ChatMessage({
               : 'border-blue-200/60 dark:border-blue-400/20'
           }`}
         >
-          <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-            {isUser ? 'You' : 'Avocarbon AI'}
+          <div className="flex items-center justify-between text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <span>{isUser ? 'You' : 'Avocarbon AI'}</span>
+            {isUser && onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                <Pencil className="size-3.5" />
+                Edit
+              </button>
+            )}
           </div>
 
           {/* Files */}
