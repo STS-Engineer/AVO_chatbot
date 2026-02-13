@@ -1,5 +1,7 @@
 import { User, Bot, FileText, Download, ImageIcon, Pencil } from "lucide-react";
 import { motion } from "motion/react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { AttachedFile } from "./ChatInput";
 import { ContextItem } from "../../api/types";
 import { API_BASE_URL } from "../../api/config";
@@ -202,8 +204,76 @@ export function ChatMessage({
 
           {/* Text Content */}
           {content && (
-            <div className="text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
-              {content}
+            <div className="text-slate-800 dark:text-slate-200 leading-relaxed prose prose-slate dark:prose-invert max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:my-3 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold prose-em:italic prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:bg-slate-100 dark:prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-slate-100 dark:prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-200 dark:prose-pre:border-slate-700 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-slate-600 dark:prose-blockquote:text-slate-400 prose-hr:border-slate-200 dark:prose-hr:border-slate-700">
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-x-auto my-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700" {...props} />
+                    </div>
+                  ),
+                  thead: ({ node, ...props }) => (
+                    <thead className="bg-slate-50 dark:bg-slate-800/50" {...props} />
+                  ),
+                  tbody: ({ node, ...props }) => (
+                    <tbody className="bg-white dark:bg-slate-900/30 divide-y divide-slate-200 dark:divide-slate-700" {...props} />
+                  ),
+                  tr: ({ node, ...props }) => (
+                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors" {...props} />
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider" {...props} />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td className="px-4 py-3 text-sm text-slate-800 dark:text-slate-200" {...props} />
+                  ),
+                  ul: ({ node, ...props }) => (
+                    <ul className="space-y-1 list-disc list-inside marker:text-blue-500 dark:marker:text-blue-400" {...props} />
+                  ),
+                  ol: ({ node, ...props }) => (
+                    <ol className="space-y-1 list-decimal list-inside marker:text-blue-500 dark:marker:text-blue-400 marker:font-semibold" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="pl-1" {...props} />
+                  ),
+                  h1: ({ node, ...props }) => (
+                    <h1 className="text-2xl font-bold mt-6 mb-4 text-slate-900 dark:text-slate-100" {...props} />
+                  ),
+                  h2: ({ node, ...props }) => (
+                    <h2 className="text-xl font-semibold mt-5 mb-3 text-slate-900 dark:text-slate-100" {...props} />
+                  ),
+                  h3: ({ node, ...props }) => (
+                    <h3 className="text-lg font-semibold mt-4 mb-2 text-slate-900 dark:text-slate-100" {...props} />
+                  ),
+                  p: ({ node, ...props }) => (
+                    <p className="my-3 leading-relaxed" {...props} />
+                  ),
+                  strong: ({ node, ...props }) => (
+                    <strong className="font-semibold text-slate-900 dark:text-slate-100" {...props} />
+                  ),
+                  em: ({ node, ...props }) => (
+                    <em className="italic text-slate-800 dark:text-slate-200" {...props} />
+                  ),
+                  code: ({ node, inline, ...props }: any) => 
+                    inline ? (
+                      <code className="bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                    ) : (
+                      <code className="block bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-3 rounded-lg overflow-x-auto text-sm font-mono" {...props} />
+                    ),
+                  hr: ({ node, ...props }) => (
+                    <hr className="my-6 border-slate-200 dark:border-slate-700" {...props} />
+                  ),
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-4 border-blue-500 pl-4 italic text-slate-600 dark:text-slate-400 my-4" {...props} />
+                  ),
+                  a: ({ node, ...props }) => (
+                    <a className="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+                  ),
+                }}
+              >
+                {content}
+              </ReactMarkdown>
             </div>
           )}
 
