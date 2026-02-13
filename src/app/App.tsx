@@ -217,6 +217,15 @@ export default function App() {
     setApiError(null);
     setIsLoading(true);
 
+    // Calculate the user message index (count only user messages before this one)
+    const currentChatMessages = chats.find(c => c.id === chatId)?.messages || [];
+    const userMessagesBefore = currentChatMessages
+      .slice(0, messageIndex + 1)
+      .filter(msg => msg.role === 'user');
+    const userMessageIndex = userMessagesBefore.length - 1;
+
+    console.log(`Editing message at frontend index ${messageIndex}, user message index: ${userMessageIndex}`);
+
     setChats(prev => prev.map(chat => {
       if (chat.id !== chatId) return chat;
       const updatedMessages = chat.messages.map((msg, idx) =>
@@ -231,7 +240,7 @@ export default function App() {
     try {
       const response: ChatResponse = await editChatMessage({
         message: content,
-        message_index: messageIndex,
+        message_index: userMessageIndex,  // Send user message index, not total message index
         include_context: true,
         top_k: 8,
         conversation_id: chatId,
